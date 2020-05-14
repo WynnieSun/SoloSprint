@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="11" class="java.beans.XMLDecoder">
+ <object class="businessPlan.VMOSA" id="VMOSA0"/>
+<void class="businessPlan.Section" id="Field0" method="getField">
+ <string>children</string>
+ <void id="ArrayList0" method="get">
+  <void class="businessPlan.Section" id="Field1" method="getField">
+   <string>children</string>
+   <void id="ArrayList1" method="get">
+    <void class="businessPlan.BusinessPlan" id="Field2" method="getField">
+     <string>root</string>
+     <void id="Section0" method="get">
+      <object idref="VMOSA0"/>
+      <void property="content">
+       <string>0</string>
+      </void>
+     </void>
+    </void>
+    <object idref="Section0"/>
+    <void id="Section1" index="0">
+     <void property="content">
+      <string>1</string>
+     </void>
+    </void>
+   </void>
+  </void>
+  <void idref="ArrayList1"/>
+  <object idref="Section1"/>
+  <void id="Section2" index="0">
+   <void property="content">
+    <string>2</string>
+   </void>
+  </void>
+ </void>
+</void>
+<void idref="ArrayList0"/>
+<void idref="Section2"/>
+<void class="businessPlan.Section" id="Field3" method="getField">
+ <string>children</string>
+ <void id="ArrayList2" method="get">
+  <void class="businessPlan.Section" id="Field4" method="getField">
+   <string>children</string>
+   <void id="ArrayList3" method="get">
+    <object idref="Section2"/>
+    <void id="Section3" index="0">
+     <void property="content">
+      <string>3</string>
+     </void>
+    </void>
+   </void>
+  </void>
+  <void idref="ArrayList3"/>
+  <object idref="Section3"/>
+  <void id="Section4" index="0">
+   <void property="content">
+    <string>4</string>
+   </void>
+  </void>
+ </void>
+</void>
+<void idref="ArrayList2"/>
+<void idref="Section4"/>
+</java>

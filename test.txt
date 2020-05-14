@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="11" class="java.beans.XMLDecoder">
+ <object class="businessPlan.VMOSA" id="VMOSA0"/>
+<void class="businessPlan.Section" id="Section0">
+ <void property="parent">
+  <object class="businessPlan.Section" id="Section1">
+   <void property="name">
+    <string>Strategy</string>
+   </void>
+   <void property="parent">
+    <object class="businessPlan.Section" id="Section2">
+     <void property="name">
+      <string>Objective</string>
+     </void>
+     <void property="parent">
+      <void class="businessPlan.Section" id="Field0" method="getField">
+       <string>children</string>
+       <void id="ArrayList0" method="get">
+        <void class="businessPlan.BusinessPlan" id="Field1" method="getField">
+         <string>root</string>
+         <void id="Section3" method="get">
+          <object idref="VMOSA0"/>
+          <void property="content">
+           <string>Hello</string>
+          </void>
+         </void>
+        </void>
+        <object idref="Section3"/>
+        <void id="Section4" index="0">
+         <void property="content">
+          <string>World</string>
+         </void>
+        </void>
+       </void>
+      </void>
+      <void idref="ArrayList0"/>
+      <object idref="Section4"/>
+     </void>
+    </object>
+   </void>
+  </object>
+ </void>
+ <void property="name">
+  <string>Action Plan</string>
+ </void>
+</void>
+<void class="businessPlan.Section" id="Field2" method="getField">
+ <string>children</string>
+ <void id="ArrayList1" method="get">
+  <object idref="Section1"/>
+  <void method="add">
+   <object idref="Section0"/>
+  </void>
+ </void>
+</void>
+<void idref="ArrayList1"/>
+<void class="businessPlan.Section" id="Field3" method="getField">
+ <string>children</string>
+ <void id="ArrayList2" method="get">
+  <object idref="Section2"/>
+  <void method="add">
+   <object idref="Section1"/>
+  </void>
+ </void>
+</void>
+<void idref="ArrayList2"/>
+<void class="businessPlan.Section" id="Field4" method="getField">
+ <string>children</string>
+ <void id="ArrayList3" method="get">
+  <object idref="Section4"/>
+  <void method="add">
+   <object idref="Section2"/>
+  </void>
+ </void>
+</void>
+<void idref="ArrayList3"/>
+</java>

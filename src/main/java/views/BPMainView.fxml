@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="743.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.BPMainController">
+   <top>
+      <ToolBar BorderPane.alignment="CENTER">
+        <items>
+            <Button id="mainPage" fx:id="MainPage" mnemonicParsing="false" onAction="#onClickBack" text="Main Page">
+               <tooltip>
+                  <Tooltip text="Go Back To the Main Page" />
+               </tooltip></Button>
+            <Button id="ViewBP" fx:id="ViewBP" mnemonicParsing="false" onAction="#onClickView" text="View BP">
+               <tooltip>
+                  <Tooltip text="View the Whole Business Plan" />
+               </tooltip>
+            </Button>
+            <Button id="Compare" fx:id="Compare" mnemonicParsing="false" onAction="#onClickCompare" text="Compare">
+               <tooltip>
+                  <Tooltip text="Compare with Another BP" />
+               </tooltip>
+            </Button>
+            <Button id="viewSection" fx:id="ViewSection" mnemonicParsing="false" onAction="#onClickSection" text="View Section">
+               <tooltip>
+                  <Tooltip text="View the Selected Section with Comments" />
+               </tooltip>
+            </Button>
+            <Button id="Edit" fx:id="Edit" mnemonicParsing="false" onAction="#onClickEdit" text="Edit">
+               <tooltip>
+                  <Tooltip text="Edit the Selected Section" />
+               </tooltip></Button>
+            <Button id="Delete" fx:id="Delete" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onClickDelete" text="Delete">
+               <tooltip>
+                  <Tooltip text="Delete the Selected  Section and its Children Sections" />
+               </tooltip></Button>
+            <Button id="Add" fx:id="Add" mnemonicParsing="false" onAction="#onClickAdd" text="Add">
+               <tooltip>
+                  <Tooltip text="Add New Children Sections to the Selected Section" />
+               </tooltip>
+            </Button>
+        </items>
+      </ToolBar>
+   </top>
+   <left>
+      <SplitPane dividerPositions="0.4769433465085639" orientation="VERTICAL" prefHeight="200.0" prefWidth="250.0" BorderPane.alignment="CENTER">
+         <items>
+            <VBox prefHeight="363.0" prefWidth="248.0">
+               <children>
+                  <Label alignment="CENTER" text="Business Plan Info:">
+                     <VBox.margin>
+                        <Insets left="20.0" top="10.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label text="Name:  ">
+                     <VBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="BPname" text="BP2020">
+                     <VBox.margin>
+                        <Insets left="80.0" top="8.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label text="Year: ">
+                     <VBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="BPyear" text="2020">
+                     <VBox.margin>
+                        <Insets left="80.0" top="8.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label text="Department: ">
+                     <VBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label id="BPdep" fx:id="BPdep" text="Computer Science">
+                     <VBox.margin>
+                        <Insets left="80.0" top="8.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label text="Type: ">
+                     <VBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="BPtype" text="VMOSA">
+                     <VBox.margin>
+                        <Insets left="80.0" top="8.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label text="Editable: ">
+                     <VBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="BPedi" text="Yes">
+                     <VBox.margin>
+                        <Insets left="80.0" top="8.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <HBox prefHeight="200.0" prefWidth="250.0">
+               <children>
+                  <TreeView id="outlineTree" fx:id="outlineTree" prefHeight="200.0" prefWidth="250.0" />
+               </children>
+            </HBox>
+         </items>
+      </SplitPane>
+   </left>
+   <center>
+      <TreeView id="contentTree" fx:id="contentTree" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

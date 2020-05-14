@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="250.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.LeaveController">
+   <top>
+      <HBox prefHeight="62.0" prefWidth="500.0" style="-fx-background-color: #ff9999;" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Confirmation" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" top="18.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <HBox prefHeight="66.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Are You Sure You Want To Leave ?">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <padding>
+                  <Insets left="30.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets left="20.0" top="40.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+   </center>
+   <bottom>
+      <HBox prefHeight="87.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button id="leaveYes" fx:id="YesButton" maxWidth="160.0" mnemonicParsing="false" onAction="#onClickYes" style="-fx-background-color: #ff9999; -fx-border-color: #737373;" text="YES" textFill="WHITE">
+               <HBox.margin>
+                  <Insets left="150.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button id="leaveNo" fx:id="NoButton" maxWidth="100.0" mnemonicParsing="false" onAction="#onClickNo" style="-fx-background-color: white; -fx-border-color: #737373;" text="NO">
+               <HBox.margin>
+                  <Insets left="100.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

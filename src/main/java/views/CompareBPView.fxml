@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="764.0" prefWidth="498.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.CompareBPController">
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <ToolBar prefHeight="40.0" prefWidth="200.0">
+              <items>
+                <Button id="compare" fx:id="compareBP" mnemonicParsing="false" onAction="#onCllickCompareBP" text="Compare">
+                     <tooltip>
+                        <Tooltip text="See Differences" />
+                     </tooltip>
+                  </Button>
+              </items>
+            </ToolBar>
+            <SplitPane dividerPositions="0.4254032258064516" prefHeight="730.0" prefWidth="498.0">
+               <items>
+                  <VBox>
+                     <children>
+                        <Label text="BP List">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="80.0" top="5.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <ListView id="comBPList" fx:id="BPCompList" prefHeight="714.0" prefWidth="207.0" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label id="labelDiff" fx:id="BP2" contentDisplay="CENTER" text="Different Sections">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="80.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ListView id="diffList" fx:id="DiffList" prefHeight="713.0" prefWidth="281.0" />
+                     </children>
+                  </VBox>
+               </items>
+            </SplitPane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

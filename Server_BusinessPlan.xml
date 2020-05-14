@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_161" class="java.beans.XMLDecoder">
+ <object class="java.util.ArrayList">
+  <void method="add">
+   <object class="businessPlan.VMOSA" id="VMOSA0">
+    <void class="businessPlan.BusinessPlan" method="getField">
+     <string>department</string>
+     <void method="set">
+      <object idref="VMOSA0"/>
+      <string>MATH</string>
+     </void>
+    </void>
+    <void class="businessPlan.BusinessPlan" method="getField">
+     <string>year</string>
+     <void method="set">
+      <object idref="VMOSA0"/>
+      <int>2030</int>
+     </void>
+    </void>
+    <void class="businessPlan.BusinessPlan" method="getField">
+     <string>isEditable</string>
+     <void method="set">
+      <object idref="VMOSA0"/>
+      <boolean>true</boolean>
+     </void>
+    </void>
+   </object>
+  </void>
+ </object>
+</java>

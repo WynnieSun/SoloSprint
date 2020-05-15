@@ -6,12 +6,12 @@ Proposed 3 tasks:
 3. subscription: both logging and simultaneous notification for observers 
 
 There are 6 test files under test/views package
-//useful tests for sprint5
+useful tests for sprint5:
 1. TestCompareView: a functional and unit test for task 1
 2. TestSectionView: a functional and unit test for task 2
 3. TestNotificationSubscriptionView: a functional and unit test for task 2
 4. TestMainPageView: a functional test for the whole program 
-//unnecessary tests for sprint4, no need to see
+unnecessary tests for sprint4, no need to see:
 5. TestEditingView
 6. TestBPMainView
 

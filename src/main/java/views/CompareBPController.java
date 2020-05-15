@@ -8,11 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.stage.Stage;
 import models.BPMainModel;
 import models.BusinessPlan;
-import models.MainViewModel;
-import models.ViewTransitionModelInterface;
 
 public class CompareBPController {
 

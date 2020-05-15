@@ -1,7 +1,6 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -59,7 +58,7 @@ public class TestMainPageView {
 			BusinessPlan BP = new VMOSA();
 			BP.name="Giao";
 			BP.year = 2020;
-			BP.department ="CS";
+			BP.department ="CS"; 
 			BP.isEditable=false;
 			BP.addSection(BP.root);
 			BP.root.content=("this is the vision");
@@ -79,6 +78,9 @@ public class TestMainPageView {
 			
 			BP2.root.addCom("great", wynnie);
 			BP.root.addCom("nice", terry);
+			
+			terry.followBP(BP2);
+			wynnie.followBP(BP2);
 
 			ArrayList <BusinessPlan> storedBP=new ArrayList<BusinessPlan>();
 			storedBP.add(BP);
@@ -96,10 +98,7 @@ public class TestMainPageView {
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9799/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			
@@ -111,8 +110,6 @@ public class TestMainPageView {
 			e.printStackTrace();
 		}
 	}
-	
-	
 	
 	@Start //Before
 	private void start(Stage stage)
@@ -265,6 +262,19 @@ public class TestMainPageView {
 		clickReset+=1;
 	}
 	
+	//follow a BP
+	private void subBP(FxRobot robot)
+	{
+		robot.clickOn("#subOnlist");
+	}
+	
+	//add children sections
+	private void addSection(FxRobot robot, String name)
+	{
+		selectSection(robot, name);
+		robot.clickOn("#Add");
+	}
+	
 	@Test
 	public void testAll(FxRobot robot) {
 		try {
@@ -321,6 +331,27 @@ public class TestMainPageView {
 			robot.clickOn("#Compare");
 			robot.clickOn("Giao (2020)");
 			robot.clickOn("#compare");
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			
+			//see notifications
+			robot.clickOn("#SubLists");
+			robot.clickOn("#BPlist");
+			selectBP(robot, "Giao (2020)");
+			subBP(robot);
+			robot.clickOn("Giao (2020)");
+			robot.clickOn("#unsub");
+			robot.clickOn("#BPlist");
+			selectBP(robot, "Hoaho (2009)");
+			copyBP(robot);
+			selectSection(robot, "Vision");
+			robot.clickOn("#Edit");
+			editSection(robot);
+			addSection(robot, "Mission");
+			Thread.sleep(3000);
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			robot.clickOn("#SubLists");
 			
 			Thread.sleep(1000);
 			

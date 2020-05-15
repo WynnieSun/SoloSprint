@@ -23,16 +23,24 @@ public abstract class BusinessPlan implements Serializable
 	public String state;
 
 	@Override
-	public String toString() {
+	public String toString() { 
 		return name+" ("+year+")";
 	}
 
 	public void addObserver(Person observer) {
+		System.out.println(observer);
 		observers.add(observer);
+		System.out.println(observers);
 	}
 	
 	public void deleteObserver(Person observer) {
-		observers.remove(observer);
+		for(int i=0; i<observers.size(); i++) {
+			if(observers.get(i).username.equals(observer.username)) {
+				observers.remove(i);
+			}
+			
+		}
+		
 	}
 	
 	public String getState() {
@@ -41,7 +49,6 @@ public abstract class BusinessPlan implements Serializable
 
 	public void setState(String state) {
 		this.state = state;
-		notifyUsers();
 	}
 	
 	//notify observers' changes of the BP

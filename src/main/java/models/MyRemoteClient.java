@@ -1,14 +1,13 @@
 package models;
 
 import java.rmi.RemoteException;
-import java.rmi.Naming;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class MyRemoteClient extends UnicastRemoteObject implements ClientInterface{
+public class MyRemoteClient implements ClientInterface, Serializable{
 
-	private BusinessPlan currentBP=null;
-	private Person loginPerson=null;
+	private BusinessPlan currentBP = null;
+	private Person loginPerson = null;
 	private static MyRemote server;
 	
 	private static final long serialVersionUID = 1L;
@@ -16,6 +15,7 @@ public class MyRemoteClient extends UnicastRemoteObject implements ClientInterfa
 	@SuppressWarnings("static-access")
 	public MyRemoteClient(MyRemote server) throws RemoteException {
 		this.server=server;
+		 
 	}
 
 	@Override
@@ -23,11 +23,10 @@ public class MyRemoteClient extends UnicastRemoteObject implements ClientInterfa
 		return loginPerson+"("+currentBP+")";
 	}
 	
-	@Override
-	public void notifyChange(Object observable, Object updateMsg) throws RemoteException {
-		String returnMessage = "got message: " + updateMsg;
-	    System.out.println(returnMessage);
-		
+	public String notifyMe(String message) {
+		String returnMessage = "Call back received: " + message;
+		System.out.println(returnMessage);
+		return returnMessage;
 	}
 
 	public BusinessPlan getCurrentBP() {
@@ -42,12 +41,16 @@ public class MyRemoteClient extends UnicastRemoteObject implements ClientInterfa
 		return loginPerson;
 	}
 
+	public void updateObserver() throws RemoteException {
+		server.updateObserver(currentBP);
+	}
+	
 	public static void main(String[] args) {
 		try {
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9999/MyRemote");
-			MyRemoteClient client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
+
+//			@SuppressWarnings("unused")
+//			MyRemoteClient client = new MyRemoteClient(server);
+		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -64,7 +67,8 @@ public class MyRemoteClient extends UnicastRemoteObject implements ClientInterfa
     
     public void askForLogin(String username, String password) {
 		try {
-			loginPerson=server.verifyLoginPerson(username,password);
+			loginPerson = server.verifyLoginPerson(username,password);
+			server.registerForCallBack(this);
 		} catch (RemoteException e) {
 			 System.err.println("Client exception: " + e.toString());
 	         e.printStackTrace();
@@ -81,6 +85,7 @@ public class MyRemoteClient extends UnicastRemoteObject implements ClientInterfa
     	loginPerson=null;
     	try {
 			server.logOut();
+			server.unregisterForCallBack(this);
 			System.out.println("user logout from Client side.");
     	}catch (RemoteException e) {
 			e.printStackTrace();

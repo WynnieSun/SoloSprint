@@ -3,6 +3,11 @@ package models;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.controlsfx.control.Notifications;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.util.Duration;
+
 public abstract class Person implements Serializable {
 	
 
@@ -16,7 +21,7 @@ public abstract class Person implements Serializable {
 
 	public Person() {
 		
-	}
+	} 
 	
 	public Person(String username, String password, String department, Boolean isAdmin) {
 		this.username = username;
@@ -32,13 +37,30 @@ public abstract class Person implements Serializable {
 	}
 	
 	public void followBP(BusinessPlan BP) {
-		followedBP.add(BP);
-		BP.addObserver(this);
+		Boolean find = false;
+		for(BusinessPlan bp: followedBP) {
+			if(bp.toString().equals(BP.toString())) {
+				find = true;
+			}
+		}
+		
+		if(!find) {
+			followedBP.add(BP);
+			BP.addObserver(this);
+		}
 	}
 	
 	public void unfollowBP(BusinessPlan BP) {
+		
 		followedBP.remove(BP);
+		for(int i = 0; i<BP.observers.size();i++) {
+			if(BP.observers.get(i).username.equals(username)) {
+				BP.observers.get(i).followedBP = this.followedBP;
+			}
+		}
 		BP.deleteObserver(this);
+
+		
 		//remove BP's notifications  
 		ArrayList<String> newNotis = new ArrayList<String>();
 		
@@ -51,6 +73,25 @@ public abstract class Person implements Serializable {
 			}
 		}
 		notifications = newNotis;
+	}
+	
+	public void showMsg() {
+		
+		Notifications  notification = Notifications.create()
+				.title(" Message")
+				.text(" The BP you followed has been changed by others")
+				.hideAfter(Duration.seconds(2))
+				.position(Pos.TOP_LEFT);
+		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				notification.show();
+				
+			}
+		
+			});
 	}
 	
 	public abstract void updateMsg(String message);

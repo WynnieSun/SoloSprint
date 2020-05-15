@@ -1,9 +1,6 @@
 package models;
 
-import java.rmi.registry.Registry;
-import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
@@ -11,68 +8,62 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-// Concrete server class
-public class MyRemoteImpl extends Observable implements MyRemote {
-
-	private class WrappedObserver implements Observer, Serializable {
-		private static final long serialVersionUID = 1L;
-		private ClientInterface ro = null;
-		public WrappedObserver(ClientInterface ro) {
-			this.ro = ro;
-		}
-		
-		@Override
-		public void update(Observable o, Object arg) {
-			try {
-				ro.notifyChange(o.toString(), arg);
-			} catch (RemoteException e) {
-				System.out.println("Remote exception removing observer: " + this);
-				o.deleteObserver(this);
-			}
-		}
-	}
+public class MyRemoteImpl implements MyRemote{
 	
 	private Person loginPerson=null;
 	private ArrayList <BusinessPlan> storedBP = new ArrayList<BusinessPlan>();
 	private ArrayList <Person> storedUser = new ArrayList<Person>();
 	
-	@SuppressWarnings("unused")
-	private static final long serialVersionUID = 1L;
+	//try to store client
+	private ArrayList <MyRemoteClient> clientList = new ArrayList<MyRemoteClient>();
+	 
 	
 	//helper attribute
 	private ArrayList<String> diffsec = new ArrayList<String>();
   
-    public MyRemoteImpl() {
-    	thread.start();
+    public MyRemoteImpl() throws RemoteException {
+    	//thread.start();
     
     }
     
-    @Override
-    public void addObserver(ClientInterface o) throws RemoteException {
-    	WrappedObserver mo = new WrappedObserver(o);
-    	addObserver(mo);
-    	System.out.println("Added observer: " + mo);
-    }
-    
-
-    Thread thread = new Thread() {
-    	@SuppressWarnings("static-access")
-		@Override
-    	public void run() {
-    		while (true) {
-    			try {
-    				thread.sleep(2*60000);
-    			} catch (InterruptedException e) {
-
+    private synchronized void doCallBacks(BusinessPlan BP) throws RemoteException{
+    	// make callback to each observer client
+    	BP.notifyUsers();
+    	System.out.println(BP.observers);
+    	System.out.println(clientList);
+    	for(MyRemoteClient observer: clientList) {
+    		for(Person person: BP.observers) {
+    			if(observer.getLoginPerson().username.equals(person.username)) {
+    				System.out.println(person);
+    				person.showMsg();
     			}
-    			setChanged();
-    			notifyObservers(new Date() + ": saved all data to the disk");
     		}
-    	};
-    };
+    	}
+    	
+    } 
+    
+    public void changed(BusinessPlan BP) throws RemoteException {
+    	doCallBacks(BP);
+    }
+
+    
+    public synchronized void registerForCallBack(MyRemoteClient client) throws RemoteException {
+    	if(!(clientList.contains(client))) {
+    		clientList.add(client);
+    		System.out.println("Registered new client");
+    	}
+    }
+    
+    public synchronized void unregisterForCallBack(MyRemoteClient client) {
+    	if(clientList.remove(client)) {
+    		System.out.println("Unregistered client");
+    	}
+    	else {
+    		System.out.println("Client wasn't registered");
+    	}
+    }
     
     //basic server methods 
 	public Person getLoginPerson() {
@@ -198,7 +189,7 @@ public class MyRemoteImpl extends Observable implements MyRemote {
     
     //called by client uploadBP function
     //edit a old BP
-    public String addBP(BusinessPlan BP) {
+    public String addBP(BusinessPlan BP) throws RemoteException {
     	String Message="";
     	if(loginPerson==null) {
     		Message="PLEASE LOGIN FIRST.";
@@ -221,12 +212,26 @@ public class MyRemoteImpl extends Observable implements MyRemote {
     			}
     		
     			storedBP.remove(current);
-    			storedBP.add(BP);
-    			Message="Replaced Old Version BP with New One.";
-    			System.out.println(Message);
+    			
     			//set state changed
             	BP.setState(BP.toString() + " Has Been Changed by: " + loginPerson.username + 
             			" at " + new Date());
+            	changed(BP);
+    			
+    	    	for(int x=0; x<BP.observers.size();x++) {
+    	    		for(int j=0; j<storedUser.size();j++) {
+    	    			if(BP.observers.get(x).username.equals(storedUser.get(j).username)) {
+    	    				storedUser.remove(j);
+    	    				storedUser.add(BP.observers.get(x));
+    	    			}
+    	    		}
+    	    	}
+    			
+    			storedBP.add(BP);
+    			Message="Replaced Old Version BP with New One.";
+    			System.out.println(Message);
+
+            	
     			return Message;
     		}
     	}
@@ -431,19 +436,57 @@ public class MyRemoteImpl extends Observable implements MyRemote {
 	public static void main(String args[]) {
 		try {
 			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.createRegistry(9999);
-			@SuppressWarnings("unused")
-			MyRemoteImpl obj = new MyRemoteImpl();
-			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9999);
-			
-			registry.bind("MyRemote", stub);
-
-			System.err.println("Server ready");
+//			Registry registry = LocateRegistry.createRegistry(9999);
+//			@SuppressWarnings("unused")
+//			MyRemoteImpl obj = new MyRemoteImpl();
+//			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9999);
+//			
+//			registry.bind("MyRemote", stub);
+//
+//			System.err.println("Server ready");
 
 		} catch (Exception e) {
 			System.err.println("Server exception: " + e.toString());
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void updateObserver(BusinessPlan currentBP) throws RemoteException {
+		String Message="";
+    	if(loginPerson==null) {
+    		Message="PLEASE LOGIN FIRST.";
+    		System.out.println(Message);
+    	}
+    	System.out.println("cur: "+currentBP);
+    	
+    	for (int i=0; i<storedBP.size();i++){
+    		BusinessPlan current=storedBP.get(i);
+
+    		if((current.department.equals(currentBP.department))&&(current.year==currentBP.year)){
+    			System.out.println("Business Plan already exists.");
+ 
+    			storedBP.remove(current);
+    			
+    	    	for(int x=0; x<currentBP.observers.size();x++) {
+    	    		for(int j=0; j<storedUser.size();j++) {
+    	    			if(currentBP.observers.get(x).username.equals(storedUser.get(j).username)) {
+    	    				storedUser.remove(j);
+    	    				storedUser.add(currentBP.observers.get(x));
+    	    			}
+    	    		}
+    	    	}
+    			
+    			storedBP.add(currentBP);
+    			Message="Replaced Old Version BP with New One.";
+    			System.out.println(Message);
+
+    		}
+    	} 
+
+    		
+		
+		
 	}
 
 }

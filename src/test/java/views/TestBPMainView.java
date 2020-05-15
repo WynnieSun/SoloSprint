@@ -1,7 +1,6 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -35,7 +34,6 @@ import models.VMOSA;
 @ExtendWith(ApplicationExtension.class)
 public class TestBPMainView {
 	
-	
 	static MyRemoteImpl server;
 	static MyRemoteClient client;
 	
@@ -44,7 +42,7 @@ public class TestBPMainView {
 	
 	//counter
 	int clickMainPage = 0;
-	int clickYes = 0;
+	int clickYes = 0; 
 	int clickNo = 0;
 	int clickBP = 0;
 	
@@ -65,7 +63,6 @@ public class TestBPMainView {
 			BP.root.children.get(0).content=("this is the misson");
 			BP.addSection(BP.root.children.get(0));
 			
-
 			BusinessPlan BP2 = new VMOSA();
 			BP2.name="Hoaho";
 			BP2.year = 2009;
@@ -95,10 +92,7 @@ public class TestBPMainView {
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9979/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			server.setStoredBP(storedBP);
@@ -109,9 +103,7 @@ public class TestBPMainView {
 			e.printStackTrace();
 		}
 	
-	}
-	
-	
+	}	
 	
 	@Start //Before
 	private void start(Stage stage)
@@ -200,7 +192,7 @@ public class TestBPMainView {
 			Assertions.assertThat(clickMainPage).isEqualTo(2);
 			Assertions.assertThat(clickYes).isEqualTo(1);
 			Assertions.assertThat(clickYes).isEqualTo(1);
-
+			
    			//logout
    			robot.clickOn("#logout");
 			

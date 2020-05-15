@@ -2,7 +2,6 @@ package views;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.testfx.api.FxAssert.verifyThat;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -41,7 +40,7 @@ import models.VMOSA;
 public class TestCompareView {
 	
 	static MyRemoteImpl server;
-	static MyRemoteClient client;
+	static MyRemoteClient client; 
 	
 	BusinessPlan BP; //currentBP
 	static BusinessPlan comBP; //Giao
@@ -102,10 +101,7 @@ public class TestCompareView {
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9299/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			server.setStoredBP(storedBP);

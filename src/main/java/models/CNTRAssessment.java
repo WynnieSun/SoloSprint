@@ -16,7 +16,7 @@ public class CNTRAssessment extends BusinessPlan
 		progMission.addChild(objective);
 		root.addChild(progMission);
 		progMission.setParent(root);
-		objective.setParent(progMission);
+		objective.setParent(progMission); 
 	}
 
 	// add new section to the Assessment

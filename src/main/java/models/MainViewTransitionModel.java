@@ -3,7 +3,6 @@ package models;
 import java.io.IOException;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -137,7 +136,7 @@ public class MainViewTransitionModel implements ViewTransitionModelInterface {
 			stage.setScene(s);
 			stage.setTitle("BPViewer");
 			stage.show();
-
+ 
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

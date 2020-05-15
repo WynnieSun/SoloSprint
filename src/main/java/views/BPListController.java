@@ -1,5 +1,6 @@
 package views;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +15,7 @@ import models.ViewTransitionModelInterface;
 
 public class BPListController {
 
-	MainViewModel model; 
+	MainViewModel model;  
 	ViewTransitionModelInterface supermodel;
 	public ObservableList<BusinessPlan> BPList= FXCollections.observableArrayList();
 	
@@ -22,6 +23,9 @@ public class BPListController {
     {
       model=newModel;
       supermodel=vm;
+      
+      //model.client.askForLogin(model.client.getLoginPerson().username, model.client.getLoginPerson().username);
+      
       ArrayList<BusinessPlan> Dulplicate=model.client.askForAllBP();
 		for (int i=0; i<Dulplicate.size();i++){
 			BPList.add(Dulplicate.get(i));
@@ -67,11 +71,15 @@ public class BPListController {
     }
     
     @FXML
-    void onClickSub(ActionEvent event) {
+    void onClickSub(ActionEvent event) throws RemoteException {
     	BusinessPlan clickedBP=BPListView.getSelectionModel().getSelectedItem();
     	if(clickedBP!=null) {
     		model.client.askForBP(clickedBP.year);
     		model.client.getLoginPerson().followBP(clickedBP);
+//    		model.client.getCurrentBP().addObserver(model.client.getLoginPerson());
+//    		model.client.updateObserver();
+//    		model.client.askForLogin(model.client.getLoginPerson().username, model.client.getLoginPerson().username);
+//    		System.out.println(model.client.getLoginPerson().followedBP);
             supermodel.showSubView(); 
         }
     }

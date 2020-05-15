@@ -1,7 +1,6 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -15,7 +14,6 @@ import org.testfx.api.FxRobot;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -90,10 +88,7 @@ public class TestEditingView {
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9989/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			server.setStoredBP(storedBP);

@@ -1,11 +1,9 @@
 package main;
-import java.rmi.Naming;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javafx.application.Application;
@@ -27,8 +25,9 @@ import views.MainController;
 
 public class Main extends Application {
 	
-	static MyRemoteImpl server;
+	//static MyRemoteImpl server;
 	static MyRemoteClient client;
+	static MyRemoteImpl server;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -57,8 +56,11 @@ public class Main extends Application {
 			Person wynnie=new NormalUser("wynnie","wynnie","CS", true);
 			Person terry=new NormalUser("terry","terry","CS", false);
 			
+			//follow BPs
 			wynnie.followBP(BP2);
+			terry.followBP(BP2);
 			
+			//add comments
 			BP2.root.addCom("great", wynnie);
 			BP.root.addCom("nice", terry);
 
@@ -71,17 +73,14 @@ public class Main extends Application {
 			storedBP.add(BP2);
 
 			////////////// Set Server & Client ////////////
-			Registry registry = LocateRegistry.createRegistry(9999);
+			Registry registry = LocateRegistry.createRegistry(9299);
 			server = new MyRemoteImpl();
-			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9999);
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9299);
 			
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9999/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			server.setStoredBP(storedBP);
@@ -91,7 +90,6 @@ public class Main extends Application {
 		{
 			e.printStackTrace();
 		}
-
 
 		//set initial stage and view
 		FXMLLoader loader0 = new FXMLLoader();

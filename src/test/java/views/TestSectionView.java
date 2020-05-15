@@ -2,7 +2,6 @@ package views;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.testfx.api.FxAssert.verifyThat;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -47,7 +46,7 @@ public class TestSectionView {
 	BusinessPlan BP; //currentBP
 	
 	//counter
-	int clickSectionView = 0;
+	int clickSectionView = 0; 
 	
 	@BeforeAll
 	//Initialize server and client 
@@ -98,11 +97,8 @@ public class TestSectionView {
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9499/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
-		    
+
 		    //initialize stored data
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);

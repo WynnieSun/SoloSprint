@@ -1,25 +1,17 @@
 package views;
 
-import javafx.scene.control.TextField;
-
 import java.util.ArrayList;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import models.BPMainModel;
-import models.BusinessPlan;
 import models.Comment;
-import models.MainViewModel;
 import models.Person;
 import models.Section;
 

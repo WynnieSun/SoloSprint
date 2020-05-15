@@ -2,7 +2,6 @@ package views;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.testfx.api.FxAssert.verifyThat;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -21,13 +20,10 @@ import org.testfx.matcher.base.NodeMatchers;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import main.Main;
-import models.BPMainModel;
 import models.BusinessPlan;
-import models.Comment;
 import models.MainViewModel;
 import models.MainViewTransitionModel;
 import models.MyRemote;
@@ -43,8 +39,8 @@ import models.VMOSA;
 
 public class TestNotificationSubscriptionView {
 	
-	static MyRemoteImpl server;
 	static MyRemoteClient client;
+	static MyRemoteImpl server;
 	
 	BusinessPlan BP; //currentBP
 	static BusinessPlan notiBP;
@@ -101,17 +97,14 @@ public class TestNotificationSubscriptionView {
 			storedUser.add(terry);
 			
 			////////////// Set Server & Client ////////////
-			Registry registry = LocateRegistry.createRegistry(9399);
+			Registry registry = LocateRegistry.createRegistry(9299);
 			server = new MyRemoteImpl();
-			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9399);
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9299);
 			
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
-			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9399/MyRemote");
 			client = new MyRemoteClient(server);
-			remoteService.addObserver(client);
 		    
 		    //initialize stored data
 			server.setStoredBP(storedBP);
@@ -246,6 +239,7 @@ public class TestNotificationSubscriptionView {
 	private void subBP(FxRobot robot)
 	{
 		robot.clickOn("#subOnlist");
+		clickSub++;
 	}
 
 	//select a section
@@ -253,14 +247,6 @@ public class TestNotificationSubscriptionView {
 	{
 		verifyThat("#outlineTree", NodeMatchers.isNotNull());
 		robot.clickOn(name);
-	}
-	
-	//show sectionView
-	private void showSection(FxRobot robot, String name)
-	{
-		selectSection(robot, name);
-		robot.clickOn("#viewSection");
-		clickSectionView++;
 	}
 	
 	//edit a section
@@ -307,6 +293,7 @@ public class TestNotificationSubscriptionView {
 			testNotiList(robot);
 			robot.clickOn("Giao (2020)");
 			robot.clickOn("#unsub");
+			clickUnsub++;
 			testSubList(robot);
 			testNotiList(robot);
 			
@@ -319,23 +306,49 @@ public class TestNotificationSubscriptionView {
 			selectSection(robot, "Vision");
 			editSection(robot);
 			addSection(robot, "Mission");
-			
+			Thread.sleep(3000);
 			robot.clickOn("#mainPage");
 			robot.clickOn("#leaveYes");
 			robot.clickOn("#SubLists");
 			testSubList(robot);
 			testNotiList(robot);
-		
 
 			//third round
    			//logout, then login as terry
-			//edit a section of Hoaho by others
-			//see notifications changes
+			//see notifications changes created by others
+			//edit a followed BP, see popup message window
+			//unfollow that, edit it, see popup message window
    			robot.clickOn("#logout");
    			login(robot,"terry","terry");
 			robot.clickOn("#SubLists");
 			robot.clickOn("#BPlist");
-		
+			selectBP(robot, "Hoaho (2009)");
+			copyBP(robot);
+			selectSection(robot, "Vision");
+			editSection(robot);
+			
+			Thread.sleep(3000);
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			robot.clickOn("#SubLists");
+			testSubList(robot);
+			testNotiList(robot);
+			
+			robot.clickOn("Hoaho (2009)");
+			robot.clickOn("#unsub");
+			clickUnsub++;
+			
+			robot.clickOn("#BPlist");
+			selectBP(robot, "Hoaho (2009)");
+			copyBP(robot);
+			selectSection(robot, "Mission");
+			addSection(robot, "Mission");
+			Thread.sleep(3000);
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			robot.clickOn("#SubLists");
+			testSubList(robot);
+			testNotiList(robot);
 			   			
    			//fourth round
    			//create a new BP, follow it
@@ -348,25 +361,18 @@ public class TestNotificationSubscriptionView {
 			robot.clickOn("#BPlist");
 			selectBP(robot, "newBP (1999)");
 			copyBP(robot);
-			deleteSection(robot, "Strategy");
+			deleteSection(robot, "Program Mission Statement");
+			robot.clickOn("#yesDe");
 			
-//			robot.clickOn("#mainPage");
-//			robot.clickOn("#leaveYes");
-//			robot.clickOn("#BPlist");
-//			selectBP(robot, "Hoaho (2009)");
-//			cloneBP(robot, "newBP", 2000);
-//			
-//			selectBP(robot, "newBP (2000)");
-//			copyBP(robot);
-//			
-//			testComList(robot);
-//			deleteCom(robot, "terry: nice job");
-//			testComList(robot);
-//			
-//			Assertions.assertThat(clickSectionView).isEqualTo(5);
-//			
-//		    Assertions.assertThat(robot.lookup("#labelCom")
-//		            .queryAs(Label.class)).hasText("Comments");    
+			Thread.sleep(3000);
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			robot.clickOn("#SubLists");
+			testSubList(robot);
+			testNotiList(robot);
+			
+			Assertions.assertThat(clickSub).isEqualTo(2);			
+			Assertions.assertThat(clickUnsub).isEqualTo(2);
 			
 			Thread.sleep(1000);
 			

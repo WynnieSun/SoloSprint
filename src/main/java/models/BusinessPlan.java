@@ -20,13 +20,38 @@ public abstract class BusinessPlan implements Serializable
 	public boolean isEditable;
 	public String type;
 	public ArrayList<Person> observers = new ArrayList<Person>();
+	public String state;
 
 	@Override
 	public String toString() {
 		return name+" ("+year+")";
 	}
 
-	public abstract void addSection(Section parent);// the only abstract method
+	public void addObserver(Person observer) {
+		observers.add(observer);
+	}
+	
+	public void deleteObserver(Person observer) {
+		observers.remove(observer);
+	}
+	
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+		notifyUsers();
+	}
+	
+	//notify observers' changes of the BP
+	public void notifyUsers() {
+		for(Person person: observers) {
+			person.updateMsg(state);
+		}
+	}
+
+	public abstract void addSection(Section parent); //the only abstract method
 	//if needed in the future, we may change the abstract method and let it throw Exceptions, but for now
 	//we think print out is enough. And we also may simplify it. 
 
@@ -35,10 +60,7 @@ public abstract class BusinessPlan implements Serializable
 		// check the node can be deleted or not
 		// delete the whole branch
 		// in order to keep a complete structure of the tree, we need to make sure that
-		// except for the last section, all the other sections must have at least one
-		// child.
-		//为了保证整个plan的完整性
-		//如果只有一个child 是不能删的
+		// except for the last section, all the other sections must have at least one child
 		Section parent = child.getParent();
 		ArrayList<Section> children = parent.getChildren();
 		int size = children.size();

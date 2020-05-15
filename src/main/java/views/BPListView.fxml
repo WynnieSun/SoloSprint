@@ -11,7 +11,7 @@
         <items>
           <Button id="cloneOnlist" fx:id="clone" mnemonicParsing="false" onAction="#onClickClone" text="Clone" />
             <Button id="copyOnlist" fx:id="copy" mnemonicParsing="false" onAction="#onClickCopy" text="Copy" />
-            <Button mnemonicParsing="false" onAction="#onClickSub" text="Subscribe" />
+            <Button id="subOnlist" fx:id="subscribe" mnemonicParsing="false" onAction="#onClickSub" text="Subscribe" />
         </items>
       </ToolBar>
    </top>

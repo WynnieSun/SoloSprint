@@ -20,5 +20,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/wynniesun/Desktop/controlsfx-8.40.11.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

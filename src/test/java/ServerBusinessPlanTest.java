@@ -67,8 +67,6 @@ class ServerBusinessPlanTest {
 			client.askForBP(2020); //see message in console, didn't login 
 			client.askForLogin("wynnie","wynnie");
 			
-			////////
-			server.register(client);
 			
 			client.askForBP(2021); // BP not exist
 			assertEquals(null,client.getCurrentBP());
@@ -76,9 +74,6 @@ class ServerBusinessPlanTest {
 			assertEquals(client.getCurrentBP().isEditable,server.findBP(2020).isEditable);
 			assertEquals(client.getLoginPerson().department, client.getCurrentBP().department);
 			System.out.println(client.getCurrentBP());
-			
-			///////////
-			System.out.println(server.getClientList());
 			
 			//ask for new BP BYBPlan created or not
 			client.newBP("BYBPlan"); 

@@ -1,5 +1,6 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.testfx.api.FxAssert.verifyThat;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -16,14 +17,17 @@ import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import org.testfx.matcher.base.NodeMatchers;
-import static org.testfx.api.FxAssert.verifyThat;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import main.Main;
+import models.BPMainModel;
 import models.BusinessPlan;
+import models.Comment;
 import models.MainViewModel;
 import models.MainViewTransitionModel;
 import models.MyRemote;
@@ -33,21 +37,22 @@ import models.NormalUser;
 import models.Person;
 import models.VMOSA;
 
-/////////////// This is a functional test for the whole program ///////////////
-
 @ExtendWith(ApplicationExtension.class)
-public class TestMainPageView {
-	
+
+////////////////// Functional test & Unit test for SubscriptionsView /////////////////
+
+public class TestNotificationSubscriptionView {
 	
 	static MyRemoteImpl server;
 	static MyRemoteClient client;
-
+	
+	BusinessPlan BP; //currentBP
+	static BusinessPlan notiBP;
+	
 	//counter
-	int clickClone = 0;
-	int clickCopy = 0;
-	int clickText = 0;
-	int clickSave = 0;
-	int clickReset = 0;
+	int clickSectionView = 0;
+	int clickSub = 0;
+	int clickUnsub = 0;
 	
 	@BeforeAll
 	//Initialize server and client 
@@ -72,11 +77,18 @@ public class TestMainPageView {
 			BP2.department ="CS";
 			BP2.isEditable=true;
 			BP2.addSection(BP2.root);
-
+			BP2.root.content=("this is the vision");
+			
+			notiBP = BP2;
+			
 			//initialize storedUser
 			Person wynnie=new NormalUser("wynnie","wynnie","CS", true);
 			Person terry=new NormalUser("terry","terry","CS", false);
 			
+			wynnie.followBP(BP2);
+			terry.followBP(BP2);
+			
+			//add comment to root
 			BP2.root.addCom("great", wynnie);
 			BP.root.addCom("nice", terry);
 
@@ -89,20 +101,19 @@ public class TestMainPageView {
 			storedUser.add(terry);
 			
 			////////////// Set Server & Client ////////////
-			Registry registry = LocateRegistry.createRegistry(9799);
+			Registry registry = LocateRegistry.createRegistry(9399);
 			server = new MyRemoteImpl();
-			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9799);
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9399);
 			
 			registry.bind("MyRemote", stub);
 			System.err.println("Server ready");
 			
 			MyRemote remoteService = (MyRemote) Naming
-					.lookup("//localhost:9799/MyRemote");
+					.lookup("//localhost:9399/MyRemote");
 			client = new MyRemoteClient(server);
 			remoteService.addObserver(client);
 		    
 		    //initialize stored data
-			
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);
 			
@@ -112,15 +123,12 @@ public class TestMainPageView {
 		}
 	}
 	
-	
-	
 	@Start //Before
 	private void start(Stage stage)
 	{
 		
 		try {
-
-			//set initial stage and view
+			
 			FXMLLoader loader0 = new FXMLLoader();
 			loader0.setLocation(Main.class.getResource("../views/MainPageShell.fxml")); 
 			
@@ -147,11 +155,11 @@ public class TestMainPageView {
 			stage.show();
 			
 		}catch(Exception e) {
-			e.printStackTrace();	//print fail
+			e.printStackTrace();	
 			fail("Fail");
 		}
 	}
-	
+
 	//general input text method
 	private void enterText(FxRobot robot, String text, String target)
 	{
@@ -172,155 +180,193 @@ public class TestMainPageView {
 		robot.clickOn(target);
 		robot.write(Integer.toString(text));
 	}
-
-	//step 1: login
+	
+	//login
 	private void login(FxRobot robot, String username, String password)
 	{
 		enterText(robot, username, "#usernameInput");
 		enterText(robot, password, "#passwordInput");
 		robot.clickOn("#login");
 	}	
-
-	//step 2: create an new BP
-	private void newBP(FxRobot robot, String BPtype, String BPname, int BPyear, boolean create)
+	
+	private void newBP(FxRobot robot, String BPtype, String BPname, int BPyear)
 	{
 		robot.clickOn("#newBP");
 		chooseType(robot, "#BPtypeBox", BPtype);
 		enterText(robot, BPname, "#NameTextField");
 		enterYearText(robot, BPyear, "#YearTextField");
-		if (create) {
-			robot.clickOn("#createButton");
-		}
-		else {
-			robot.clickOn("#cancelButton");
+		robot.clickOn("#createButton");
+	
+	}
+	
+	//unit test for SubscriptionList
+	public void testSubList(FxRobot robot)
+	{
+		verifyThat("#followBPs", NodeMatchers.isNotNull());
+		
+		@SuppressWarnings("unchecked")
+		ListView<BusinessPlan> BPList = (ListView<BusinessPlan>) robot.lookup("#followBPs")
+				.queryAll().iterator().next();
+		Assertions.assertThat(BPList).hasExactlyNumItems(client.getLoginPerson().followedBP.size());
+		for(BusinessPlan bp: client.getLoginPerson().followedBP) {
+			Assertions.assertThat(BPList).hasListCell(bp); 
 		}
 		
 	}
 	
-	//step 3: select a BP
+	//unit test for NotificationsList
+	public void testNotiList(FxRobot robot)
+	{
+		verifyThat("#notis", NodeMatchers.isNotNull());
+
+		@SuppressWarnings("unchecked")
+		ListView<String> notiList = (ListView<String>) robot.lookup("#notis")
+		.queryAll().iterator().next();
+		Assertions.assertThat(notiList).hasExactlyNumItems(client.getLoginPerson().notifications.size());
+		for(String noti: client.getLoginPerson().notifications) {
+			Assertions.assertThat(notiList).hasListCell(noti); 
+		}
+		
+	}
+	
+	//select a BP
 	private void selectBP(FxRobot robot, String name)
 	{
 		verifyThat("#MainBPList", NodeMatchers.isNotNull());
 		robot.clickOn(name);
 	}
 	
-	
-	//step 4: clone a BP
-	private void cloneBP(FxRobot robot, String name, int year, Boolean bool)
-	{
-		robot.clickOn("#cloneOnlist");
-		clickClone+=1;
-		enterText(robot, name, "#cloneName");
-		enterYearText(robot, year, "#cloneYear");
-		if(bool) {
-			robot.clickOn("#cloneBP");
-		}
-		else {
-			robot.clickOn("#cancelClone");
-		}	
-	}
-	
-	//step 5: copy a BP
+	//copy a BP
 	private void copyBP(FxRobot robot)
 	{
 		robot.clickOn("#copyOnlist");
-		clickCopy+=1;
 	}
 	
-	//step 6: select a section
+	//follow a BP
+	private void subBP(FxRobot robot)
+	{
+		robot.clickOn("#subOnlist");
+	}
+
+	//select a section
 	private void selectSection(FxRobot robot, String name)
 	{
 		verifyThat("#outlineTree", NodeMatchers.isNotNull());
 		robot.clickOn(name);
 	}
 	
-	//add new comment
-	private void addCom(FxRobot robot, String com)
+	//show sectionView
+	private void showSection(FxRobot robot, String name)
 	{
-		enterText(robot, com, "#writeCom");
-		robot.clickOn("#addCom");	
-	}
-	
-	//step 6: select a section
-	private void deleteCom(FxRobot robot, String com)
-	{
-		verifyThat("#Comments", NodeMatchers.isNotNull());
-		robot.clickOn(com);
-		robot.clickOn("#deleteCom");
+		selectSection(robot, name);
+		robot.clickOn("#viewSection");
+		clickSectionView++;
 	}
 	
 	//edit a section
 	private void editSection(FxRobot robot)
 	{
+		robot.clickOn("#Edit");
 		robot.clickOn("#text");
-		clickText+=1;
-		robot.write(" haha NO!");
+		robot.write(" haha!");
 		robot.clickOn("#save");
-		clickSave+=1;
-
-		robot.clickOn("#text");
-		clickText+=1;
-		robot.write(" lalalala~");
-		robot.clickOn("#reset");
-		clickReset+=1;
+	}
+	
+	//add children sections
+	private void addSection(FxRobot robot, String name)
+	{
+		selectSection(robot, name);
+		robot.clickOn("#Add");
+	}
+	
+	//delete a section with children sections
+	private void deleteSection(FxRobot robot, String name) {
+		selectSection(robot, name);
+		robot.clickOn("#Delete");
 	}
 	
 	@Test
-	public void testAll(FxRobot robot) {
+	public void testComments(FxRobot robot) {
 		try {
+			
 			Thread.sleep(1000);
 			
-			//login
+			//first round
+			//login as wynnie
+			//view subscriptions 
+			//follow & unfollow a BP
 			login(robot,"wynnie","wynnie");
+			robot.clickOn("#SubLists");
+			testSubList(robot);
+			testNotiList(robot);
+			
 			robot.clickOn("#BPlist");
-			
-			//create new BPs: three different situations
-			newBP(robot,"VMOSA","newBP",1999, true);
-			robot.clickOn("#BPlist");
-			
-			robot.clickOn("#personalInfo");
-			
-			newBP(robot,"VMOSA","peiBP",1999, true);
-			robot.clickOn("#BPlist");
-			
-			newBP(robot,"VMOSA","peiBP",1989, false);
-			robot.clickOn("#BPlist");
-			
-			//clone a BP
 			selectBP(robot, "Giao (2020)");
-			cloneBP(robot, "New", 2000, true);
+			subBP(robot);
+			testSubList(robot);
+			testNotiList(robot);
+			robot.clickOn("Giao (2020)");
+			robot.clickOn("#unsub");
+			testSubList(robot);
+			testNotiList(robot);
 			
-			//copy a BP
+			//second round
+			//edit sections of Hoaho
+			//view notifications changes
+			robot.clickOn("#BPlist");
 			selectBP(robot, "Hoaho (2009)");
 			copyBP(robot);
-			
-			Assertions.assertThat(clickClone).isEqualTo(1);
-			Assertions.assertThat(clickCopy).isEqualTo(1);
-		
-			//view whole BP
-			robot.clickOn("#ViewBP");
-			
-			//view a section
 			selectSection(robot, "Vision");
-			robot.clickOn("#viewSection");
-			
-			//edit comments
-			addCom(robot, "haha");
-			deleteCom(robot, "wynnie: great");
-			
-			//edit a section
-			selectSection(robot, "Mission");
-			robot.clickOn("#Edit");
 			editSection(robot);
-		
-			Assertions.assertThat(clickText).isEqualTo(2);
-			Assertions.assertThat(clickSave).isEqualTo(1);
-			Assertions.assertThat(clickReset).isEqualTo(1);
+			addSection(robot, "Mission");
 			
-			//compare
-			robot.clickOn("#Compare");
-			robot.clickOn("Giao (2020)");
-			robot.clickOn("#compare");
+			robot.clickOn("#mainPage");
+			robot.clickOn("#leaveYes");
+			robot.clickOn("#SubLists");
+			testSubList(robot);
+			testNotiList(robot);
+		
+
+			//third round
+   			//logout, then login as terry
+			//edit a section of Hoaho by others
+			//see notifications changes
+   			robot.clickOn("#logout");
+   			login(robot,"terry","terry");
+			robot.clickOn("#SubLists");
+			robot.clickOn("#BPlist");
+		
+			   			
+   			//fourth round
+   			//create a new BP, follow it
+			//edit a section
+			//view notifications
+			newBP(robot,"CNTRAssessment","newBP",1999);
+			robot.clickOn("#BPlist");
+			selectBP(robot, "newBP (1999)");
+			subBP(robot);
+			robot.clickOn("#BPlist");
+			selectBP(robot, "newBP (1999)");
+			copyBP(robot);
+			deleteSection(robot, "Strategy");
+			
+//			robot.clickOn("#mainPage");
+//			robot.clickOn("#leaveYes");
+//			robot.clickOn("#BPlist");
+//			selectBP(robot, "Hoaho (2009)");
+//			cloneBP(robot, "newBP", 2000);
+//			
+//			selectBP(robot, "newBP (2000)");
+//			copyBP(robot);
+//			
+//			testComList(robot);
+//			deleteCom(robot, "terry: nice job");
+//			testComList(robot);
+//			
+//			Assertions.assertThat(clickSectionView).isEqualTo(5);
+//			
+//		    Assertions.assertThat(robot.lookup("#labelCom")
+//		            .queryAs(Label.class)).hasText("Comments");    
 			
 			Thread.sleep(1000);
 			

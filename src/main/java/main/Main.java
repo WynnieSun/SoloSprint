@@ -1,4 +1,5 @@
 package main;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -56,6 +57,8 @@ public class Main extends Application {
 			Person wynnie=new NormalUser("wynnie","wynnie","CS", true);
 			Person terry=new NormalUser("terry","terry","CS", false);
 			
+			wynnie.followBP(BP2);
+			
 			BP2.root.addCom("great", wynnie);
 			BP.root.addCom("nice", terry);
 
@@ -67,22 +70,23 @@ public class Main extends Application {
 			storedBP.add(BP);
 			storedBP.add(BP2);
 
-			//bind server and client
-			Registry registry = LocateRegistry.createRegistry(1199);
+			////////////// Set Server & Client ////////////
+			Registry registry = LocateRegistry.createRegistry(9999);
 			server = new MyRemoteImpl();
-        	MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(server, 0);
-			registry.rebind("MyRemote", stub);
-			MyRemote serverInterface=(MyRemote) registry.lookup("MyRemote");
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9999);
 			
-		    client=new MyRemoteClient(serverInterface);
-		    UnicastRemoteObject.exportObject(client,0);
+			registry.bind("MyRemote", stub);
+			System.err.println("Server ready");
+			
+			MyRemote remoteService = (MyRemote) Naming
+					.lookup("//localhost:9999/MyRemote");
+			client = new MyRemoteClient(server);
+			remoteService.addObserver(client);
 		    
-		    //set server
+		    //initialize stored data
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);
-			
-			server.register(client);
-
+		
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();

@@ -2,9 +2,13 @@ package views;
 
 import java.rmi.RemoteException;
 
+import org.controlsfx.control.Notifications;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.TextArea;
+import javafx.util.Duration;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import models.BPMainModel;
@@ -51,6 +55,12 @@ public class BPEditingController {
 		String changed = ContentTextArea.getText();
 		current.setContent(changed);
 		model.client.uploadBP();
+		Notifications  notification = Notifications.create()
+				.title(" Message")
+				.text(" You have made change. We will notify users who have subscribed this BP")
+				.hideAfter(Duration.seconds(2))
+				.position(Pos.TOP_RIGHT);
+		notification.show();
 		savedMessge.setOpacity(1);
 
 	}

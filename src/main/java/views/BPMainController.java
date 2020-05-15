@@ -1,16 +1,20 @@
 package views;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.controlsfx.control.Notifications;
+
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import models.BPMainModel;
 import models.BYBPlan;
 import models.BusinessPlan;
@@ -189,6 +193,12 @@ public class BPMainController {
 			
 			SelectedItem.getValue().addChild(child);
 			model.client.uploadBP();
+			Notifications  notification = Notifications.create()
+					.title(" Message")
+					.text(" You have made change. We will notify users who have subscribed this BP")
+					.hideAfter(Duration.seconds(2))
+					.position(Pos.TOP_RIGHT);
+			notification.show();
 			model.showTreeView();
 			showOutlineTree(root);}
     }

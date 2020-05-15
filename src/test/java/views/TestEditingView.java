@@ -1,8 +1,11 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -21,6 +24,7 @@ import javafx.stage.Stage;
 import main.Main;
 import models.BPMainModel;
 import models.BusinessPlan;
+import models.MyRemote;
 import models.MyRemoteClient;
 import models.MyRemoteImpl;
 import models.NormalUser;
@@ -43,14 +47,10 @@ public class TestEditingView {
 	
 	@BeforeAll
 	//Initialize server and client 
-	static void Initialization()
+	static void Initialization() throws Exception
 	{		
 		try
 		{		
-			Registry registry = LocateRegistry.createRegistry(1199);
-
-			server = new MyRemoteImpl();
-			
 			//initialize storedBP
 			BusinessPlan BP = new VMOSA();
 			BP.name="Giao";
@@ -61,7 +61,6 @@ public class TestEditingView {
 			BP.root.content=("this is the vision");
 			BP.root.children.get(0).content=("this is the misson");
 			BP.addSection(BP.root.children.get(0));
-			
 
 			BusinessPlan BP2 = new VMOSA();
 			BP2.name="Hoaho";
@@ -83,6 +82,20 @@ public class TestEditingView {
 			storedUser.add(wynnie);
 			storedUser.add(terry);
 			
+			////////////// Set Server & Client ////////////
+			Registry registry = LocateRegistry.createRegistry(9989);
+			server = new MyRemoteImpl();
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9989);
+			
+			registry.bind("MyRemote", stub);
+			System.err.println("Server ready");
+			
+			MyRemote remoteService = (MyRemote) Naming
+					.lookup("//localhost:9989/MyRemote");
+			client = new MyRemoteClient(server);
+			remoteService.addObserver(client);
+		    
+		    //initialize stored data
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);
 			
@@ -90,7 +103,6 @@ public class TestEditingView {
 		{
 			e.printStackTrace();
 		}
-		client = new MyRemoteClient(server);
 	}
 	
 	

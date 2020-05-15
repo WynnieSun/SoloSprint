@@ -36,6 +36,9 @@ public class BPListController {
 
     @FXML
     private Button copy;
+    
+    @FXML
+    private Button subscribe;
 
     @FXML
     private ListView<BusinessPlan> BPListView;
@@ -49,7 +52,6 @@ public class BPListController {
             model.showCloneView(supermodel);
     	}
     }
-    
 
     @FXML
     void onClickCopy(ActionEvent event) {
@@ -66,6 +68,11 @@ public class BPListController {
     
     @FXML
     void onClickSub(ActionEvent event) {
-
+    	BusinessPlan clickedBP=BPListView.getSelectionModel().getSelectedItem();
+    	if(clickedBP!=null) {
+    		model.client.askForBP(clickedBP.year);
+    		model.client.getLoginPerson().followBP(clickedBP);
+            supermodel.showSubView(); 
+        }
     }
 }

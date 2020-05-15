@@ -1,6 +1,7 @@
 package models;
 
 import java.rmi.registry.Registry;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.beans.XMLDecoder;
@@ -14,49 +15,64 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 // Concrete server class
-public class MyRemoteImpl implements MyRemote {
+public class MyRemoteImpl extends Observable implements MyRemote {
 
+	private class WrappedObserver implements Observer, Serializable {
+		private static final long serialVersionUID = 1L;
+		private ClientInterface ro = null;
+		public WrappedObserver(ClientInterface ro) {
+			this.ro = ro;
+		}
+		
+		@Override
+		public void update(Observable o, Object arg) {
+			try {
+				ro.notifyChange(o.toString(), arg);
+			} catch (RemoteException e) {
+				System.out.println("Remote exception removing observer: " + this);
+				o.deleteObserver(this);
+			}
+		}
+	}
+	
 	private Person loginPerson=null;
 	private ArrayList <BusinessPlan> storedBP = new ArrayList<BusinessPlan>();
 	private ArrayList <Person> storedUser = new ArrayList<Person>();
-	private ArrayList <MyRemoteClient> clientList = new ArrayList<MyRemoteClient>();
+	
+	@SuppressWarnings("unused")
+	private static final long serialVersionUID = 1L;
 	
 	//helper attribute
 	private ArrayList<String> diffsec = new ArrayList<String>();
   
     public MyRemoteImpl() {
-    	
+    	thread.start();
+    
     }
     
-    //register client here
-    public void register(MyRemoteClient client) {
-    	if (!(clientList.contains(client))) 
-    	{
-    		clientList.add(client);
-    		System.out.println("Registered new client ");
-    	}
+    @Override
+    public void addObserver(ClientInterface o) throws RemoteException {
+    	WrappedObserver mo = new WrappedObserver(o);
+    	addObserver(mo);
+    	System.out.println("Added observer: " + mo);
     }
+    
 
-    public void unregister(MyRemoteClient client) {
-    	if (clientList.remove(client)) {
-    		System.out.println("Unregistered client ");
-    	} else {
-    		System.out.println("unregister: clientwasn't registered.");
-    	}
-    }
+    Thread thread = new Thread() {
+    	@SuppressWarnings("static-access")
+		@Override
+    	public void run() {
+    		while (true) {
+    			try {
+    				thread.sleep(2*60000);
+    			} catch (InterruptedException e) {
 
-    //notify clients
-    public void callback() {
-    	System.out.println(clientList);
-    	for (int i = 0; i < clientList.size(); i++){
-    	      MyRemoteClient nextClient = clientList.get(i);
-    	      // invoke the callback method
-    	      System.out.println("Notify: "+ nextClient);
-    	        nextClient.notifyChange("Number of registered clients="
-    	           +  clientList.size());
-    	    }
-    	
-    }
+    			}
+    			setChanged();
+    			notifyObservers(new Date() + ": saved all data to the disk");
+    		}
+    	};
+    };
     
     //basic server methods 
 	public Person getLoginPerson() {
@@ -92,21 +108,15 @@ public class MyRemoteImpl implements MyRemote {
     		if ((storedUser.get(i).username.equals(username))&&(storedUser.get(i).password.equals(password))){
     			loginPerson=storedUser.get(i);
     			System.out.println("user found.");
-    			
+
     			return loginPerson;
+    			
     		}
     	}
     	System.out.println("user not found.");
     	return null;
     }
     
-    public ArrayList<MyRemoteClient> getClientList() {
-		return clientList;
-	}
-
-	public void setClientList(ArrayList<MyRemoteClient> clientList) {
-		this.clientList = clientList;
-	}
 
 	//helper class for checking the person exists or not in the test file
     public Person findPerson(String username, String password, String deparment, Boolean bol) {
@@ -195,7 +205,9 @@ public class MyRemoteImpl implements MyRemote {
     		System.out.println(Message);
     		return Message;
     	}
+    	
     	System.out.println(storedBP);
+    	
     	for (int i=0; i<storedBP.size();i++){
     		BusinessPlan current=storedBP.get(i);
 
@@ -204,14 +216,17 @@ public class MyRemoteImpl implements MyRemote {
     			if(current.isEditable==false) {
     				Message="This BusinessPlan is not Editable";
         			System.out.println(Message);
-        			//callback();
+
         			return Message;
     			}
+    		
     			storedBP.remove(current);
     			storedBP.add(BP);
     			Message="Replaced Old Version BP with New One.";
     			System.out.println(Message);
-    			//callback();
+    			//set state changed
+            	BP.setState(BP.toString() + " Has Been Changed by: " + loginPerson.username + 
+            			" at " + new Date());
     			return Message;
     		}
     	}
@@ -219,7 +234,7 @@ public class MyRemoteImpl implements MyRemote {
     	System.out.println("Business does not exist.");
     	Message="Added new BP to Server";
     	System.out.println(Message);
-    	//callback();
+
     	return Message;
     }
     
@@ -237,7 +252,7 @@ public class MyRemoteImpl implements MyRemote {
     		BusinessPlan current=storedBP.get(i);
     		if((current.department.equals(BP.department))&&(current.year==BP.year)){
     			Message=("Business Plan already exists.");
-    			//callback();
+    			
     			System.out.println(Message);
     			return Message;
     		}
@@ -245,7 +260,7 @@ public class MyRemoteImpl implements MyRemote {
     	storedBP.add(BP);
     	System.out.println("Business does not exist.");
     	Message="Added new BP to Server";
-    	//callback();
+    	
     	System.out.println(Message);
     	return Message;
 	}
@@ -268,6 +283,7 @@ public class MyRemoteImpl implements MyRemote {
     	if((BP1.getRoot().showContent()).equals(BP2.getRoot().showContent())){
     		//do nothing if same
     	}
+    	
     	else {
     		diff.add(BP1.toString() + "--" + BP1.getRoot().showContent());
     		diff.add(BP2.toString() + "--" + BP2.getRoot().showContent());
@@ -414,10 +430,12 @@ public class MyRemoteImpl implements MyRemote {
 
 	public static void main(String args[]) {
 		try {
-			MyRemoteImpl obj = new MyRemoteImpl();
-			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(obj, 0);
 			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.getRegistry();
+			Registry registry = LocateRegistry.createRegistry(9999);
+			@SuppressWarnings("unused")
+			MyRemoteImpl obj = new MyRemoteImpl();
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9999);
+			
 			registry.bind("MyRemote", stub);
 
 			System.err.println("Server ready");

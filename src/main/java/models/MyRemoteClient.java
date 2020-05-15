@@ -1,15 +1,20 @@
 package models;
 
 import java.rmi.RemoteException;
+import java.rmi.Naming;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class MyRemoteClient implements ClientInterface{
+public class MyRemoteClient extends UnicastRemoteObject implements ClientInterface{
 
 	private BusinessPlan currentBP=null;
 	private Person loginPerson=null;
-	private MyRemote server;
+	private static MyRemote server;
 	
-	public MyRemoteClient(MyRemote server) {
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("static-access")
+	public MyRemoteClient(MyRemote server) throws RemoteException {
 		this.server=server;
 	}
 
@@ -18,8 +23,9 @@ public class MyRemoteClient implements ClientInterface{
 		return loginPerson+"("+currentBP+")";
 	}
 	
-	public void notifyChange(String message) {
-		String returnMessage = "Call back received: " + message;
+	@Override
+	public void notifyChange(Object observable, Object updateMsg) throws RemoteException {
+		String returnMessage = "got message: " + updateMsg;
 	    System.out.println(returnMessage);
 		
 	}
@@ -34,11 +40,17 @@ public class MyRemoteClient implements ClientInterface{
 
 	public Person getLoginPerson() {
 		return loginPerson;
-
 	}
 
 	public static void main(String[] args) {
-
+		try {
+			MyRemote remoteService = (MyRemote) Naming
+					.lookup("//localhost:9999/MyRemote");
+			MyRemoteClient client = new MyRemoteClient(server);
+			remoteService.addObserver(client);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
     public void Hello() {
@@ -178,15 +190,12 @@ public class MyRemoteClient implements ClientInterface{
     public ArrayList<String> showDiff(BusinessPlan BP2) {
 		try {
 			ArrayList<String> diff = server.compare(currentBP, BP2);
-			System.out.println(diff);
 			return diff;
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	return null;
     }
-
 
 }
     

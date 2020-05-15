@@ -2,9 +2,11 @@ package views;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.testfx.api.FxAssert.verifyThat;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -26,6 +28,7 @@ import main.Main;
 import models.BPMainModel;
 import models.BusinessPlan;
 import models.Comment;
+import models.MyRemote;
 import models.MyRemoteClient;
 import models.MyRemoteImpl;
 import models.NormalUser;
@@ -48,14 +51,10 @@ public class TestSectionView {
 	
 	@BeforeAll
 	//Initialize server and client 
-	static void Initialization()
+	static void Initialization() throws Exception
 	{		
 		try
 		{		
-			Registry registry = LocateRegistry.createRegistry(1699);
-
-			server = new MyRemoteImpl();
-			
 			//initialize storedBP
 			BusinessPlan BP = new VMOSA();
 			BP.name="Giao";
@@ -91,6 +90,20 @@ public class TestSectionView {
 			storedUser.add(wynnie);
 			storedUser.add(terry);
 			
+			////////////// Set Server & Client ////////////
+			Registry registry = LocateRegistry.createRegistry(9499);
+			server = new MyRemoteImpl();
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9499);
+			
+			registry.bind("MyRemote", stub);
+			System.err.println("Server ready");
+			
+			MyRemote remoteService = (MyRemote) Naming
+					.lookup("//localhost:9499/MyRemote");
+			client = new MyRemoteClient(server);
+			remoteService.addObserver(client);
+		    
+		    //initialize stored data
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);
 			
@@ -98,7 +111,6 @@ public class TestSectionView {
 		{
 			e.printStackTrace();
 		}
-		client = new MyRemoteClient(server);
 	}
 	
 	@Start //Before
@@ -213,7 +225,7 @@ public class TestSectionView {
 		robot.clickOn("#addCom");	
 	}
 	
-	//step 6: select a section
+	//delete comment
 	private void deleteCom(FxRobot robot, String com)
 	{
 		verifyThat("#Comments", NodeMatchers.isNotNull());

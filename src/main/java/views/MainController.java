@@ -58,7 +58,7 @@ public class MainController {
     
     @FXML
     void onClickSub(ActionEvent event) {
-
+    	model.showSubView();
     }
 
 }

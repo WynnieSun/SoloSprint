@@ -1,8 +1,11 @@
 package views;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -21,6 +24,7 @@ import javafx.stage.Stage;
 import main.Main;
 import models.BPMainModel;
 import models.BusinessPlan;
+import models.MyRemote;
 import models.MyRemoteClient;
 import models.MyRemoteImpl;
 import models.NormalUser;
@@ -46,14 +50,10 @@ public class TestBPMainView {
 	
 	@BeforeAll
 	//Initialize server and client 
-	static void Initialization()
+	static void Initialization() throws Exception
 	{		
 		try
 		{		
-			Registry registry = LocateRegistry.createRegistry(1899);
-
-			server = new MyRemoteImpl();
-			
 			//initialize storedBP
 			BusinessPlan BP = new VMOSA();
 			BP.name="Giao";
@@ -80,11 +80,27 @@ public class TestBPMainView {
 			//initialize storedUser
 			Person wynnie=new NormalUser("wynnie","wynnie","CS", true);
 			Person terry=new NormalUser("terry","terry","CS", false);
+			
+			wynnie.followBP(BP2);
 
 			ArrayList <Person> storedUser=new ArrayList<Person>();
 			storedUser.add(wynnie);
 			storedUser.add(terry);
 			
+			////////////// Set Server & Client ////////////
+			Registry registry = LocateRegistry.createRegistry(9979);
+			server = new MyRemoteImpl();
+			MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(new MyRemoteImpl(), 9979);
+			
+			registry.bind("MyRemote", stub);
+			System.err.println("Server ready");
+			
+			MyRemote remoteService = (MyRemote) Naming
+					.lookup("//localhost:9979/MyRemote");
+			client = new MyRemoteClient(server);
+			remoteService.addObserver(client);
+		    
+		    //initialize stored data
 			server.setStoredBP(storedBP);
 			server.setStoredUser(storedUser);
 			
@@ -92,7 +108,7 @@ public class TestBPMainView {
 		{
 			e.printStackTrace();
 		}
-		client = new MyRemoteClient(server);
+	
 	}
 	
 	
@@ -134,11 +150,13 @@ public class TestBPMainView {
 	
 	public void clickTreeView(FxRobot robot)
 	{
+		@SuppressWarnings("unchecked")
 		TreeView<Section> outlinetree = (TreeView<Section>) scene.lookup("#outlineTree");
 		outlinetree.getRoot();
 		System.out.println(outlinetree.getRoot());
 		Assertions.assertThat(outlinetree.getRoot().getValue()).isEqualTo(BP.root);
 		
+		@SuppressWarnings("unchecked")
 		TreeView<String> contenttree = (TreeView<String>) scene.lookup("#contentTree");
 		contenttree.getRoot();
 		System.out.println(contenttree.getRoot());

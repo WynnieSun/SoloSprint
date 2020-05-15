@@ -14,6 +14,7 @@ import views.LoginController;
 import views.MainController;
 import views.NewBPController;
 import views.PersonalInfoController;
+import views.SubscriptionViewController;
 
 public class MainViewTransitionModel implements ViewTransitionModelInterface {
 
@@ -38,7 +39,6 @@ public class MainViewTransitionModel implements ViewTransitionModelInterface {
 	      PersonalInfoController cont = loader.getController();
 	      cont.setModel(model);
 	      
-	      
 	    } catch (IOException e) {
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();
@@ -56,7 +56,24 @@ public class MainViewTransitionModel implements ViewTransitionModelInterface {
 	      mainview.setCenter(view);
 	      BPListController cont = loader.getController();
 	      cont.setModel(model,vm);
-	      System.out.println(cont.BPList);
+	      
+	    } catch (IOException e) {
+	      // TODO Auto-generated catch block
+	      e.printStackTrace();
+	    }
+		
+	}
+	
+	@Override
+	public void showSubView() {
+		FXMLLoader loader = new FXMLLoader();
+	    loader.setLocation(MainViewTransitionModel.class
+	        .getResource("../views/SubscriptionsView.fxml"));
+	    try {
+	      Pane view = loader.load();
+	      mainview.setCenter(view);
+	      SubscriptionViewController cont = loader.getController();
+	      cont.setModel(model);
 	      
 	    } catch (IOException e) {
 	      // TODO Auto-generated catch block

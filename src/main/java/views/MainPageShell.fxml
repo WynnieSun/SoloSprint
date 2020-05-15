@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
@@ -43,7 +43,7 @@
                   </Pane>
                   <Pane>
                      <children>
-                        <Button fx:id="subscriptions" mnemonicParsing="false" onAction="#onClickSub" text="Subscriptions">
+                        <Button id="SubLists" fx:id="subscriptions" mnemonicParsing="false" onAction="#onClickSub" text="Subscriptions">
                            <font>
                               <Font size="14.0" />
                            </font>

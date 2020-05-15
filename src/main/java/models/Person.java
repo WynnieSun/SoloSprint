@@ -1,6 +1,7 @@
 package models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public abstract class Person implements Serializable {
 	
@@ -10,6 +11,8 @@ public abstract class Person implements Serializable {
 	public String password;
 	public String department;
 	public Boolean isAdmin;
+	public ArrayList<BusinessPlan> followedBP = new ArrayList<BusinessPlan>();
+	public ArrayList<String> notifications = new ArrayList<String>();
 
 	public Person() {
 		
@@ -28,6 +31,28 @@ public abstract class Person implements Serializable {
 				+ isAdmin + "]";
 	}
 	
-	public abstract void update();
+	public void followBP(BusinessPlan BP) {
+		followedBP.add(BP);
+		BP.addObserver(this);
+	}
+	
+	public void unfollowBP(BusinessPlan BP) {
+		followedBP.remove(BP);
+		BP.deleteObserver(this);
+		//remove BP's notifications  
+		ArrayList<String> newNotis = new ArrayList<String>();
+		
+		for(String noti: notifications) {
+			if(noti.contains(BP.toString())){
+				
+			}
+			else {
+				newNotis.add(noti);
+			}
+		}
+		notifications = newNotis;
+	}
+	
+	public abstract void updateMsg(String message);
 	
 }

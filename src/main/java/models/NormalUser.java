@@ -20,11 +20,9 @@ public class NormalUser extends Person implements Serializable
 		this.isAdmin = isAdmin;
 	}
 	
-	
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-		
+	public void updateMsg(String message) {
+		notifications.add(message);
+
 	} 
 
 }

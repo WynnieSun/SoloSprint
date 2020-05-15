@@ -7,13 +7,13 @@
 
 ### There are 6 test files under test/views package   
 
-useful tests for sprint5:   
+Useful tests for sprint5:   
 1. TestCompareView: a functional and unit test for task 1     
 2. TestSectionView: a functional and unit test for task 2     
-3. TestNotificationSubscriptionView: a functional and unit test for task 2   
+3. TestNotificationSubscriptionView: a functional and unit test for task 3   
 4. TestMainPageView: a functional test for the whole program    
 
-unnecessary tests for sprint4, no need to see:    
+Unnecessary tests for sprint4, no need to see:    
 1. TestEditingView   
 2. TestBPMainView  
 

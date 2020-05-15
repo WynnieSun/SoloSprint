@@ -3,7 +3,7 @@
 ### Proposed 3 tasks:
 1. compare: a listview on GUI shows all different sections between two BPs
 2. comment: a listview on GUI shows all comments for each selected section
-3. subscription: both logging and simultaneous notification for observers 
+3. subscription: clients observe server, users observe BPs; both logging and simultaneous notification for observers 
 
 ### There are 6 test files under test/views package   
 
